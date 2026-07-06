@@ -19,6 +19,10 @@ public class AppSettingsPlugin: NSObject, FlutterPlugin, UIWindowSceneDelegate {
         // Same story as register(with:): the FlutterPlugin requirement is nonisolated, but
         // Flutter always invokes it on the main thread — hop onto the main actor so the
         // conformance no longer crosses isolation (ConformanceIsolation, Swift 6.2+).
+        // `result` is a plain non-Sendable closure, so region analysis (Xcode 26.4+) treats
+        // its capture below as a send into the main-actor region. It never actually leaves
+        // the main thread — handle is called there and the reply runs there — opt it out.
+        nonisolated(unsafe) let result = result
         MainActor.assumeIsolated {
             switch(call.method) {
             case "openSettings":
