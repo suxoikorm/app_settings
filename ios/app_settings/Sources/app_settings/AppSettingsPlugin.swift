@@ -15,14 +15,19 @@ public class AppSettingsPlugin: NSObject, FlutterPlugin, UIWindowSceneDelegate {
         }
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch(call.method) {
-        case "openSettings":
-            handleOpenSettings(call: call, result: result)
-            break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
+    nonisolated public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        // Same story as register(with:): the FlutterPlugin requirement is nonisolated, but
+        // Flutter always invokes it on the main thread — hop onto the main actor so the
+        // conformance no longer crosses isolation (ConformanceIsolation, Swift 6.2+).
+        MainActor.assumeIsolated {
+            switch(call.method) {
+            case "openSettings":
+                handleOpenSettings(call: call, result: result)
+                break
+            default:
+                result(FlutterMethodNotImplemented)
+                break
+            }
         }
     }
     
